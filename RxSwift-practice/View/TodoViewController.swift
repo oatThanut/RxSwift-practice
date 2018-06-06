@@ -9,6 +9,8 @@
 import UIKit
 
 class TodoViewController: UIViewController {
+    
+    var InputTextField: UITextField? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +23,16 @@ class TodoViewController: UIViewController {
     }
 
     @IBAction func AddBtn(_ sender: Any) {
+        let alert = UIAlertController(title: "Add ToDo List", message: "", preferredStyle: .alert)
+        alert.addTextField(configurationHandler: { textField in
+            self.InputTextField = textField
+        })
+        alert.addAction(UIAlertAction(title: "Done", style: .default, handler: { alert -> Void in
+            
+        }))
+        alert.addAction(UIAlertAction(title: "Cancle", style: .default, handler: nil))
         
+        present(alert, animated: true, completion: nil)
     }
 
 }
@@ -32,7 +43,7 @@ extension TodoViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath) 
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
         
         return cell
     }
