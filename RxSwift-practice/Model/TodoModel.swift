@@ -10,11 +10,16 @@ import Foundation
 
 class TodoModel {
     
-    let Name: String
+    let name: String
     var status: Bool
     
     public init(name: String) {
-        self.Name = name
+        self.name = name
         self.status = false
+    }
+    
+    public init(name: String, status: Bool) {
+        self.name = name
+        self.status = status
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TodoViewController.swift
 //  RxSwift-practice
 //
 //  Created by oatThanut on 6/6/2561 BE.
@@ -8,44 +8,69 @@
 
 import UIKit
 
-class TodoViewController: UIViewController {
-    
-    var InputTextField: UITextField? = nil
+class TodoViewController: UITableViewController {
 
+    var InputTextField: UITextField? = nil
+    let viewModel = TodoViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     @IBAction func AddBtn(_ sender: Any) {
-        let alert = UIAlertController(title: "Add ToDo List", message: "", preferredStyle: .alert)
-        alert.addTextField(configurationHandler: { textField in
+        let add = UIAlertController(title: "Add TODO List", message: "", preferredStyle: .alert)
+        add.addTextField { (textField) in
             self.InputTextField = textField
-        })
-        alert.addAction(UIAlertAction(title: "Done", style: .default, handler: { alert -> Void in
-            
+        }
+        add.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (alert) in
+            guard let name = self.InputTextField?.text else { return }
+            if name != "" {
+                self.viewModel.AddTodo(name: name)
+            }
+            self.updateUI()
         }))
-        alert.addAction(UIAlertAction(title: "Cancle", style: .default, handler: nil))
+        add.addAction(UIAlertAction(title: "Cancle", style: .default, handler: nil))
         
-        present(alert, animated: true, completion: nil)
-    }
-
-}
-
-extension TodoViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        present(add, animated: true)
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func updateUI() {
+        tableView.reloadData()
+    }
+
+    // MARK: - Table view data source
+
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
+        return 1
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // #warning Incomplete implementation, return the number of rows
+        return viewModel.todoList.count
+    }
+
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
         
+        let todo = viewModel.getContent(indexPath.row)
+        cell.textLabel?.text = "\(todo.0)        \(todo.1)"
+
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.viewModel.changeTodoStatus(indexPath.row)
+        updateUI()
+    }
+
 }
