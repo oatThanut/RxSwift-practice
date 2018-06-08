@@ -10,6 +10,8 @@ import UIKit
 
 class TodoViewController: UITableViewController {
 
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     var InputTextField: UITextField? = nil
     let viewModel = TodoViewModel()
     
