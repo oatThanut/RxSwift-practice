@@ -10,5 +10,5 @@ import Foundation
 
 class DataSource {
     
-    static var List = ["First": false, "Second": false]
+    static var List = ["First": false, "Second": false, "Third": false, "Fourth": false]
 }

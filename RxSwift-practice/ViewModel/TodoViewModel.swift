@@ -11,10 +11,12 @@ import Foundation
 class TodoViewModel {
     
     var todoList: [TodoModel]
+    var showList:[TodoModel]
     var index: Int
     
     init() {
         todoList = DataSource.List.map(TodoModel.init)
+        showList = todoList
         index = 0
     }
     
@@ -27,9 +29,14 @@ class TodoViewModel {
     }
     
     func getContent(_ index: Int) -> (String, String) {
-        let todo = todoList[index]
+        let todo = showList[index]
         let status = todo.status ? "Done" : "Not done"
         return (todo.name, status)
+    }
+    
+    func search(_ query: String) {
+        showList = todoList.filter{$0.name.hasPrefix(query)}
+        print(showList.map{$0.name})
     }
     
     func changeTodoStatus(_ index: Int) {
@@ -40,6 +47,7 @@ class TodoViewModel {
     func AddTodo(name: String) {
         let todo = TodoModel(name: name)
         todoList.append(todo)
+        showList = todoList
         DataSource.List[todo.name] = todo.status
     }
     
