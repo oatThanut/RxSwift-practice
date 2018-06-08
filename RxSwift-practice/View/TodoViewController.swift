@@ -7,10 +7,16 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class TodoViewController: UITableViewController {
 
+    
+    @IBOutlet weak var searchBar: UISearchBar!
     var InputTextField: UITextField? = nil
+    let disposeBag = DisposeBag()
+    
     let viewModel = TodoViewModel()
     
     override func viewDidLoad() {
@@ -18,6 +24,7 @@ class TodoViewController: UITableViewController {
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
+        addBinding()
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,6 +49,16 @@ class TodoViewController: UITableViewController {
         present(add, animated: true)
     }
     
+    func addBinding() {
+        searchBar.rx.text
+            .orEmpty
+            .subscribe(onNext: { query in
+                self.viewModel.search(query)
+                self.updateUI()
+            })
+            .disposed(by: disposeBag)
+    }
+    
     func updateUI() {
         tableView.reloadData()
     }
@@ -55,7 +72,7 @@ class TodoViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return viewModel.todoList.count
+        return viewModel.showList.count
     }
 
     
