@@ -13,34 +13,22 @@ import RxCocoa
 class TodoViewModel {
     
     var todoList: [TodoModel]
-    var showList:[TodoModel]
-    var index: Int
     private let privateDataSource: Variable<[TodoModel]>
     let dataSource: Observable<[TodoModel]>
     
     init() {
         todoList = DataSource.List.map(TodoModel.init)
-        showList = todoList
-        index = 0
         privateDataSource = Variable([])
         self.dataSource = privateDataSource.asObservable()
         privateDataSource.value = DataSource.List.map(TodoModel.init)
     }
     
-    var todoName: String {
-        return todoList[index].name
-    }
-    
-    var todoStatus: Bool {
-        return todoList[index].status
-    }
-    
-    var todoNum: Int {
-        return todoList[index].num
+    var numRow: Int {
+        return privateDataSource.value.count
     }
     
     func getContent(_ index: Int) -> (String, String, Int) {
-        let todo = showList[index]
+        let todo = privateDataSource.value[index]
         let status = todo.status ? "Done" : "Not done"
         return (todo.name, status, todo.num)
     }
@@ -51,13 +39,11 @@ class TodoViewModel {
         } else if str == "-" {
             todoList[index].num -= 1
         }
-        print("Tapped [\(index), +] \(todoList[index].num)")
     }
     
     func search(_ query: String) {
-        showList = todoList.filter{$0.name.hasPrefix(query)}
         privateDataSource.value = todoList.filter{$0.name.hasPrefix(query)}
-        print(showList.map{$0.name})
+        print(privateDataSource.value.map{$0.name})
     }
     
     func changeTodoStatus(_ index: Int) {
@@ -68,7 +54,6 @@ class TodoViewModel {
     func AddTodo(name: String) {
         let todo = TodoModel(name: name)
         todoList.append(todo)
-        showList = todoList
         DataSource.List[todo.name] = todo.status
         privateDataSource.value.append(todo)
     }

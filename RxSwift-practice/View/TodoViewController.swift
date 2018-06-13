@@ -50,29 +50,52 @@ class TodoViewController: UITableViewController {
     }
     
     func addBinding() {
-        searchBar.rx.text
+        searchBar
+            .rx
+            .text
             .orEmpty
             .throttle(0.5, scheduler: MainScheduler.instance)
-            .subscribe(onNext: { query in
-                self.viewModel.search(query)
-                self.updateUI()
-            })
+            .subscribe(
+                onNext: { query in
+                    self.viewModel.search(query)
+                    self.updateUI()
+                })
             .disposed(by: disposeBag)
         
-        viewModel.dataSource.bind(to: tableView.rx.items(cellIdentifier: "TodoCell", cellType: CustomCell.self)) { row, element, cell in
-                print(row)
-                let todo = self.viewModel.getContent(row)
-                cell.nameLabel.text = todo.0
-                cell.numberTextField.text = "\(todo.2)"
-                cell.increaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
-                    self.viewModel.addOrRemove(str: "+", index: row)
-                    self.updateUI()
-                }).disposed(by: cell.disposeBag)
-                cell.decreaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
-                    self.viewModel.addOrRemove(str: "-", index: row)
-                    self.updateUI()
-                }).disposed(by: cell.disposeBag)
-            }.disposed(by: disposeBag)
+        viewModel
+            .dataSource
+            .bind(to: tableView
+                        .rx
+                        .items(cellIdentifier: "TodoCell", cellType: CustomCell.self)) { row, element, cell in
+                            let todo = self.viewModel.getContent(row)
+                            cell.nameLabel.text = todo.0
+                            cell.numberTextField.text = "\(todo.2)"
+                            cell
+                                .increaseButton
+                                .rx
+                                .tap
+                                .asObservable()
+                                .debounce(0.5, scheduler: MainScheduler.instance)
+                                .subscribe(
+                                    onNext: { _ in
+                                        self.viewModel.addOrRemove(str: "+", index: row)
+                                        self.updateUI()
+                                    })
+                                .disposed(by: cell.disposeBag)
+                            cell
+                                .decreaseButton
+                                .rx
+                                .tap
+                                .asObservable()
+                                .debounce(0.5, scheduler: MainScheduler.instance)
+                                .subscribe(
+                                    onNext: { _ in
+                                        self.viewModel.addOrRemove(str: "-", index: row)
+                                        self.updateUI()
+                                    })
+                                .disposed(by: cell.disposeBag)
+                }
+            .disposed(by: disposeBag)
     }
     
     func updateUI() {
@@ -88,38 +111,8 @@ class TodoViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return viewModel.showList.count
+        return viewModel.numRow
     }
-
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath) as! CustomCell
-        
-        cell.decreaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
-            //            print("Tapped [\(indexPath.row), -] \(todo.2)")
-            self.viewModel.addOrRemove(str: "-", index: indexPath.row)
-//            self.updateUI()
-        }).disposed(by: cell.disposeBag)
-        cell.increaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
-            //            print("Tapped [\(indexPath.row), +] \(todo.2)")
-            self.viewModel.addOrRemove(str: "+", index: indexPath.row)
-//            self.updateUI()
-        }).disposed(by: cell.disposeBag)
-        
-        let todo = viewModel.getContent(indexPath.row)
-        cell.nameLabel.text = todo.0
-        
-        
-//        cell.stepper.rx.value.asObservable().subscribe(
-//            onNext: { (value) in
-//            print(value)
-//        }).disposed(by: cell.disposeBag)
-        
-        cell.numberTextField.text = "\(todo.2)"
-        
-        return cell
-    }
-    */
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.viewModel.changeTodoStatus(indexPath.row)
