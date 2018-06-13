@@ -12,7 +12,6 @@ import RxCocoa
 
 class TodoViewController: UITableViewController {
 
-    
     @IBOutlet weak var searchBar: UISearchBar!
     var InputTextField: UITextField? = nil
     let disposeBag = DisposeBag()
@@ -52,6 +51,7 @@ class TodoViewController: UITableViewController {
     func addBinding() {
         searchBar.rx.text
             .orEmpty
+            .throttle(0.5, scheduler: MainScheduler.instance)
             .subscribe(onNext: { query in
                 self.viewModel.search(query)
                 self.updateUI()
@@ -77,11 +77,30 @@ class TodoViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath) as! CustomCell
+        
+        cell.decreaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
+            //            print("Tapped [\(indexPath.row), -] \(todo.2)")
+            self.viewModel.addOrRemove(str: "-", index: indexPath.row)
+//            self.updateUI()
+        }).disposed(by: cell.disposeBag)
+        cell.increaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
+            //            print("Tapped [\(indexPath.row), +] \(todo.2)")
+            self.viewModel.addOrRemove(str: "+", index: indexPath.row)
+//            self.updateUI()
+        }).disposed(by: cell.disposeBag)
         
         let todo = viewModel.getContent(indexPath.row)
-        cell.textLabel?.text = "\(todo.0)        \(todo.1)"
-
+        cell.nameLabel.text = todo.0
+        
+        
+//        cell.stepper.rx.value.asObservable().subscribe(
+//            onNext: { (value) in
+//            print(value)
+//        }).disposed(by: cell.disposeBag)
+        
+        cell.numberTextField.text = "\(todo.2)"
+        
         return cell
     }
     
@@ -90,4 +109,20 @@ class TodoViewController: UITableViewController {
         updateUI()
     }
 
+}
+
+class CustomCell: UITableViewCell {
+    
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var numberTextField: UITextField!
+    @IBOutlet weak var decreaseButton: UIButton!
+    @IBOutlet weak var increaseButton: UIButton!
+    @IBOutlet weak var stepper: UIStepper!
+    
+    var disposeBag = DisposeBag()
+    private let currentValue: BehaviorRelay<UInt> = BehaviorRelay(value: 1)
+    
+    override func prepareForReuse() {
+        disposeBag = DisposeBag()
+    }
 }

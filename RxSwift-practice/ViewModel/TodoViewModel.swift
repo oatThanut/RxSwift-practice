@@ -7,17 +7,23 @@
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
 
 class TodoViewModel {
     
     var todoList: [TodoModel]
     var showList:[TodoModel]
     var index: Int
+    private let privateDataSource: Variable<[String]>
+    let dataSource: Observable<[String]>
     
     init() {
         todoList = DataSource.List.map(TodoModel.init)
         showList = todoList
         index = 0
+        privateDataSource = Variable([])
+        self.dataSource = privateDataSource.asObservable()
     }
     
     var todoName: String {
@@ -28,10 +34,23 @@ class TodoViewModel {
         return todoList[index].status
     }
     
-    func getContent(_ index: Int) -> (String, String) {
+    var todoNum: Int {
+        return todoList[index].num
+    }
+    
+    func getContent(_ index: Int) -> (String, String, Int) {
         let todo = showList[index]
         let status = todo.status ? "Done" : "Not done"
-        return (todo.name, status)
+        return (todo.name, status, todo.num)
+    }
+    
+    func addOrRemove(str: String, index: Int) {
+        if str == "+" {
+            todoList[index].num += 1
+        } else if str == "-" {
+            todoList[index].num -= 1
+        }
+        print("Tapped [\(index), +] \(todoList[index].num)")
     }
     
     func search(_ query: String) {
