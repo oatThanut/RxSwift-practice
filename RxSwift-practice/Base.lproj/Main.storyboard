@@ -41,35 +41,31 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Se7-th-y1D">
-                                            <rect key="frame" x="261" y="6" width="98" height="30"/>
+                                            <rect key="frame" x="257" y="0.5" width="102" height="41"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="anb-Ab-dyI">
-                                                    <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="30" height="41"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                                     <state key="normal" title="-"/>
                                                 </button>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="1" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7Cz-xu-cBa">
-                                                    <rect key="frame" x="35" y="0.0" width="28" height="30"/>
+                                                    <rect key="frame" x="35" y="0.0" width="32" height="41"/>
                                                     <nil key="textColor"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                                     <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                                                 </textField>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9sw-dW-cER">
-                                                    <rect key="frame" x="68" y="0.0" width="30" height="30"/>
-                                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
+                                                    <rect key="frame" x="72" y="0.0" width="30" height="41"/>
+                                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="24"/>
                                                     <state key="normal" title="+"/>
                                                 </button>
                                             </subviews>
                                         </stackView>
-                                        <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" translatesAutoresizingMaskIntoConstraints="NO" id="4sv-e6-FQ6">
-                                            <rect key="frame" x="151" y="7" width="94" height="29"/>
-                                        </stepper>
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="Se7-th-y1D" secondAttribute="trailing" constant="16" id="Kr0-h5-PB7"/>
                                         <constraint firstItem="BW5-sD-LFe" firstAttribute="leading" secondItem="EEz-dr-bA1" secondAttribute="leadingMargin" constant="16" id="TUo-XW-BTs"/>
-                                        <constraint firstItem="Se7-th-y1D" firstAttribute="leading" secondItem="4sv-e6-FQ6" secondAttribute="trailing" constant="16" id="cfX-fH-QnJ"/>
                                         <constraint firstItem="Se7-th-y1D" firstAttribute="centerY" secondItem="EEz-dr-bA1" secondAttribute="centerY" id="eie-2n-lpn"/>
-                                        <constraint firstItem="4sv-e6-FQ6" firstAttribute="centerY" secondItem="EEz-dr-bA1" secondAttribute="centerY" id="lKS-QA-tYP"/>
                                         <constraint firstItem="BW5-sD-LFe" firstAttribute="centerY" secondItem="EEz-dr-bA1" secondAttribute="centerY" id="pE9-v6-HHt"/>
                                     </constraints>
                                 </tableViewCellContentView>
@@ -78,7 +74,6 @@
                                     <outlet property="increaseButton" destination="9sw-dW-cER" id="f1j-YQ-otk"/>
                                     <outlet property="nameLabel" destination="BW5-sD-LFe" id="yUN-Nc-VIY"/>
                                     <outlet property="numberTextField" destination="7Cz-xu-cBa" id="ydq-GT-ip5"/>
-                                    <outlet property="stepper" destination="4sv-e6-FQ6" id="BNe-4A-Afl"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

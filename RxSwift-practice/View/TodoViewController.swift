@@ -23,6 +23,7 @@ class TodoViewController: UITableViewController {
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
+        tableView.dataSource = nil
         addBinding()
     }
 
@@ -57,6 +58,21 @@ class TodoViewController: UITableViewController {
                 self.updateUI()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.dataSource.bind(to: tableView.rx.items(cellIdentifier: "TodoCell", cellType: CustomCell.self)) { row, element, cell in
+                print(row)
+                let todo = self.viewModel.getContent(row)
+                cell.nameLabel.text = todo.0
+                cell.numberTextField.text = "\(todo.2)"
+                cell.increaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
+                    self.viewModel.addOrRemove(str: "+", index: row)
+                    self.updateUI()
+                }).disposed(by: cell.disposeBag)
+                cell.decreaseButton.rx.tap.asObservable().debounce(0.5, scheduler: MainScheduler.instance).subscribe(onNext: { _ in
+                    self.viewModel.addOrRemove(str: "-", index: row)
+                    self.updateUI()
+                }).disposed(by: cell.disposeBag)
+            }.disposed(by: disposeBag)
     }
     
     func updateUI() {
@@ -75,7 +91,7 @@ class TodoViewController: UITableViewController {
         return viewModel.showList.count
     }
 
-    
+    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath) as! CustomCell
         
@@ -103,6 +119,7 @@ class TodoViewController: UITableViewController {
         
         return cell
     }
+    */
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.viewModel.changeTodoStatus(indexPath.row)
@@ -117,7 +134,6 @@ class CustomCell: UITableViewCell {
     @IBOutlet weak var numberTextField: UITextField!
     @IBOutlet weak var decreaseButton: UIButton!
     @IBOutlet weak var increaseButton: UIButton!
-    @IBOutlet weak var stepper: UIStepper!
     
     var disposeBag = DisposeBag()
     private let currentValue: BehaviorRelay<UInt> = BehaviorRelay(value: 1)

@@ -15,8 +15,8 @@ class TodoViewModel {
     var todoList: [TodoModel]
     var showList:[TodoModel]
     var index: Int
-    private let privateDataSource: Variable<[String]>
-    let dataSource: Observable<[String]>
+    private let privateDataSource: Variable<[TodoModel]>
+    let dataSource: Observable<[TodoModel]>
     
     init() {
         todoList = DataSource.List.map(TodoModel.init)
@@ -24,6 +24,7 @@ class TodoViewModel {
         index = 0
         privateDataSource = Variable([])
         self.dataSource = privateDataSource.asObservable()
+        privateDataSource.value = DataSource.List.map(TodoModel.init)
     }
     
     var todoName: String {
@@ -55,6 +56,7 @@ class TodoViewModel {
     
     func search(_ query: String) {
         showList = todoList.filter{$0.name.hasPrefix(query)}
+        privateDataSource.value = todoList.filter{$0.name.hasPrefix(query)}
         print(showList.map{$0.name})
     }
     
@@ -68,6 +70,7 @@ class TodoViewModel {
         todoList.append(todo)
         showList = todoList
         DataSource.List[todo.name] = todo.status
+        privateDataSource.value.append(todo)
     }
     
     func MarkAsDone(indexPath: Int) {
