@@ -12,7 +12,6 @@ import RxCocoa
 
 class TodoViewController: UITableViewController {
 
-    
     @IBOutlet weak var searchBar: UISearchBar!
     var InputTextField: UITextField? = nil
     let disposeBag = DisposeBag()
@@ -24,6 +23,7 @@ class TodoViewController: UITableViewController {
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
+        tableView.dataSource = nil
         addBinding()
     }
 
@@ -50,12 +50,51 @@ class TodoViewController: UITableViewController {
     }
     
     func addBinding() {
-        searchBar.rx.text
+        searchBar
+            .rx
+            .text
             .orEmpty
-            .subscribe(onNext: { query in
-                self.viewModel.search(query)
-                self.updateUI()
-            })
+            .throttle(0.5, scheduler: MainScheduler.instance)
+            .subscribe(
+                onNext: { query in
+                    self.viewModel.search(query)
+                    self.updateUI()
+                })
+            .disposed(by: disposeBag)
+        
+        viewModel
+            .dataSource
+            .bind(to: tableView
+                        .rx
+                        .items(cellIdentifier: "TodoCell", cellType: CustomCell.self)) { row, element, cell in
+                            let todo = self.viewModel.getContent(row)
+                            cell.nameLabel.text = todo.0
+                            cell.numberTextField.text = "\(todo.2)"
+                            cell
+                                .increaseButton
+                                .rx
+                                .tap
+                                .asObservable()
+                                .debounce(0.5, scheduler: MainScheduler.instance)
+                                .subscribe(
+                                    onNext: { _ in
+                                        self.viewModel.addOrRemove(str: "+", index: row)
+                                        self.updateUI()
+                                    })
+                                .disposed(by: cell.disposeBag)
+                            cell
+                                .decreaseButton
+                                .rx
+                                .tap
+                                .asObservable()
+                                .debounce(0.5, scheduler: MainScheduler.instance)
+                                .subscribe(
+                                    onNext: { _ in
+                                        self.viewModel.addOrRemove(str: "-", index: row)
+                                        self.updateUI()
+                                    })
+                                .disposed(by: cell.disposeBag)
+                }
             .disposed(by: disposeBag)
     }
     
@@ -72,17 +111,7 @@ class TodoViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return viewModel.showList.count
-    }
-
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
-        
-        let todo = viewModel.getContent(indexPath.row)
-        cell.textLabel?.text = "\(todo.0)        \(todo.1)"
-
-        return cell
+        return viewModel.numRow
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -90,4 +119,19 @@ class TodoViewController: UITableViewController {
         updateUI()
     }
 
+}
+
+class CustomCell: UITableViewCell {
+    
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var numberTextField: UITextField!
+    @IBOutlet weak var decreaseButton: UIButton!
+    @IBOutlet weak var increaseButton: UIButton!
+    
+    var disposeBag = DisposeBag()
+    private let currentValue: BehaviorRelay<UInt> = BehaviorRelay(value: 1)
+    
+    override func prepareForReuse() {
+        disposeBag = DisposeBag()
+    }
 }

@@ -12,14 +12,17 @@ class TodoModel {
     
     let name: String
     var status: Bool
+    var num: Int
     
     public init(name: String) {
         self.name = name
         self.status = false
+        self.num = 1
     }
     
     public init(name: String, status: Bool) {
         self.name = name
         self.status = status
+        self.num = 1
     }
 }
